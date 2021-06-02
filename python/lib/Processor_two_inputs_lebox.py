@@ -378,3 +378,30 @@ class TensorRTEngine(object):
         # img = np.ascontiguousarray(img)
 
         return img, ratio, (dw, dh)
+
+    def load_image(self, index):
+        '''
+
+        Args:
+            self:
+            index:
+
+        Returns:
+         data = cv2.imread(img_path)  # BGR
+
+        '''
+        # loads 1 image from dataset, returns img, original hw, resized hw
+        # print(self.img_files[index])
+        path, path_lwir = self.img_files[index], self.lwir_files[index]
+        img, lwir = cv2.imread(path), cv2.imread(path_lwir)  # BGR
+        img_aware = cv2.imread(path)
+        assert img is not None, 'Image Not Found ' + path
+        assert lwir is not None, 'Image Not Found ' + path_lwir
+        h0, w0 = img.shape[:2]  # orig hw
+        r = self.img_size / max(h0, w0)  # resize image to img_size
+        if r != 1:  # always resize down, only resize up if training with augmentation
+            interp = cv2.INTER_AREA if r < 1 and not self.augment else cv2.INTER_LINEAR
+            img = cv2.resize(img, (int(w0 * r), int(h0 * r)), interpolation=interp)
+            lwir = cv2.resize(lwir, (int(w0 * r), int(h0 * r)), interpolation=interp)
+        img_aware = cv2.resize(img_aware, (128, 128))
+        return img, lwir, (h0, w0), img.shape[:2], img_aware  # img, hw_original, hw_resized
