@@ -10,5 +10,5 @@
 ###### 1、模型量化 .onnx --> .trt 
           ./python/export_tensorrt.py # 具体参考源码修改
 
-###### 2、模型推理  输入图像，输入结果
+###### 2、模型推理  输入图像，输出结果
          ./python/lib/demo_test.py  # 具体参考源码修改
